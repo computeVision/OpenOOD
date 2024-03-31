@@ -16,7 +16,7 @@ configs/pipelines/train/baseline.yml \
 --dataset.image_size 32 \
 --optimizer.num_epochs 100 \
 --num_workers 8 \
---num_gpus 2 \
+--num_gpus 1 \
 --num_machines 1 \
 --machine_rank 0 \
 --mark 0 &

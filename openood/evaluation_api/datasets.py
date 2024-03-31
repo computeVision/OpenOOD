@@ -411,7 +411,7 @@ def data_setup(data_root, id_data_name):
         download_dataset(dataset, data_root)
 
 
-def get_id_ood_dataloader(id_name, data_root, preprocessor, **loader_kwargs):
+def get_id_ood_dataloader(id_name, data_root, preprocessor, att=False, **loader_kwargs):
     if 'imagenet' in id_name:
         if tvs_new:
             if isinstance(preprocessor,
@@ -438,6 +438,16 @@ def get_id_ood_dataloader(id_name, data_root, preprocessor, **loader_kwargs):
 
     # weak augmentation for data_aux
     test_standard_preprocessor = get_default_preprocessor(id_name)
+
+    if att:
+        from torchvision import transforms as trn
+        preprocessor = trn.Compose([
+            trn.Resize(256),
+            trn.CenterCrop(224),
+            trn.ToTensor()
+        ])
+
+        test_standard_preprocessor = get_default_preprocessor(id_name, att=True)
 
     dataloader_dict = {}
     data_info = DATA_INFO[id_name]
