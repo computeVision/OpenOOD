@@ -50,6 +50,7 @@ class Convert:
 class TestStandardPreProcessor(BasePreprocessor):
     """For test and validation dataset standard image transformation."""
     def __init__(self, config: Config):
+        print("TestStandardPreProcessor")
         self.transform = tvs_trans.Compose([
             Convert('RGB'),
             tvs_trans.Resize(config.pre_size, interpolation=INTERPOLATION),
@@ -70,6 +71,7 @@ class ImageNetCPreProcessor(BasePreprocessor):
 class TestStandardPreProcessorAtt(BasePreprocessor):
     """For test and validation dataset standard image transformation."""
     def __init__(self, config: Config):
+        print("TestStandardPreProcessorAtt")
         self.transform = tvs_trans.Compose([
             Convert('RGB'),
             tvs_trans.Resize(config.pre_size, interpolation=INTERPOLATION),

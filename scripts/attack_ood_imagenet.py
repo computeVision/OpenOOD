@@ -42,7 +42,6 @@ def update(d, u):
             d[k] = v
     return d
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--arch',
                     default='resnet50',

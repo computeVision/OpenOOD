@@ -20,6 +20,7 @@ from openood.networks.scale_net import ScaleNet
 from .datasets import DATA_INFO, data_setup, get_id_ood_dataloader
 from .postprocessor import get_postprocessor
 from .preprocessor import get_default_preprocessor
+from .preprocessor import default_preprocessing_dict
 
 from openood.attacks.misc import (
     args_handling,
@@ -114,8 +115,9 @@ class AttackDataset:
         dataloader_dict = get_id_ood_dataloader(id_name, data_root,
                                                 preprocessor, att=True, **loader_kwargs)
 
+        preprocessor = get_default_preprocessor(id_name, att=True)
 
-        from .preprocessor import default_preprocessing_dict
+       
         tmp = default_preprocessing_dict[id_name]['normalization']
         normalize = {'mean':tmp[0], 'std':tmp[1]}
 
@@ -211,11 +213,7 @@ class AttackDataset:
         with open(os.path.join(self.data_root, img_list)) as f:
             lines = f.readlines()
 
-        base_pth = os.path.join('./data/attacked', args.att + "_" + self.id_name + "_" + args.arch)
-        create_dir(base_pth)
-        log_pth = os.path.join(base_pth, 'logs')
-        log = create_log_file(args, log_pth)
-        log['timestamp_start'] =  datetime.now().strftime("%Y-%m-%d-%H:%M")
+        timestamp_start =  datetime.now().strftime("%Y-%m-%d-%H:%M")
 
         start_time = time.time()
 
@@ -231,10 +229,13 @@ class AttackDataset:
             logits = fmodel(data)
             preds = logits.argmax(1)
 
-            breakpoint()
+            # breakpoint()
 
             total_samples += len(label)
             correct_predicted += (label==preds).cpu().sum().item()
+
+            print(data[0])
+            print(correct_predicted)
 
             if args.att in DEEPFOOL:
                 raw_advs, clipped_advs, success = attack(fmodel, data, label, epsilons=args.eps)
@@ -275,6 +276,12 @@ class AttackDataset:
         # except Exception as e:
         #     print("An exception occurred:", str(e))
         # finally:
+        base_pth = os.path.join('./data/attacked', args.att + "_" + self.id_name + "_" + args.arch)
+        create_dir(base_pth)
+        log_pth = os.path.join(base_pth, 'logs')
+        log = create_log_file(args, log_pth)
+        log['timestamp_start'] = timestamp_start
+
         log['successful_attacked'] = successful_attacked
         asr = successful_attacked / total_samples 
 
