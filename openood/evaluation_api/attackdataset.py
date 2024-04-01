@@ -20,6 +20,7 @@ from openood.networks.scale_net import ScaleNet
 from .datasets import DATA_INFO, data_setup, get_id_ood_dataloader
 from .postprocessor import get_postprocessor
 from .preprocessor import get_default_preprocessor
+from .preprocessor import default_preprocessing_dict
 
 from openood.attacks.misc import (
     args_handling,
@@ -94,7 +95,7 @@ class AttackDataset:
         # # check the arguments
         if id_name not in DATA_INFO:
             raise ValueError(f'Dataset [{id_name}] is not supported')
-
+     
         # get data preprocessor
         if preprocessor is None:
             preprocessor = get_default_preprocessor(id_name, att=True)
@@ -115,7 +116,6 @@ class AttackDataset:
                                                 preprocessor, att=True, **loader_kwargs)
 
 
-        from .preprocessor import default_preprocessing_dict
         tmp = default_preprocessing_dict[id_name]['normalization']
         normalize = {'mean':tmp[0], 'std':tmp[1]}
 
@@ -230,8 +230,6 @@ class AttackDataset:
             label = batch['label'].cuda()
             logits = fmodel(data)
             preds = logits.argmax(1)
-
-            breakpoint()
 
             total_samples += len(label)
             correct_predicted += (label==preds).cpu().sum().item()

@@ -440,7 +440,7 @@ def get_id_ood_dataloader(id_name, data_root, preprocessor, att=False, **loader_
     test_standard_preprocessor = get_default_preprocessor(id_name)
 
     if att:
-        test_standard_preprocessor = get_default_preprocessor(id_name, att=True)
+        preprocessor = get_default_preprocessor(id_name, att=True)
 
     dataloader_dict = {}
     data_info = DATA_INFO[id_name]
