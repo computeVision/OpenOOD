@@ -56,7 +56,7 @@ parser.add_argument("--bpda",  default=False, type=str2bool, help="")
 parser.add_argument("--eps",  default="4/255", help="")
 parser.add_argument("--norm",  default="Linf", choices=['Linf', 'L2', 'L1'], help="")
 
-parser.add_argument("--debug",  default=True, type=str2bool, help="")
+parser.add_argument("--debug",  default=False, type=str2bool, help="")
 args = parser.parse_args()
 
 if args.eps and "." in args.eps:

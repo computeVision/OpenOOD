@@ -22,6 +22,7 @@ from .postprocessor import get_postprocessor
 from .preprocessor import get_default_preprocessor
 from .preprocessor import default_preprocessing_dict
 
+
 from openood.attacks.misc import (
     args_handling,
     print_args,
@@ -95,7 +96,7 @@ class AttackDataset:
         # # check the arguments
         if id_name not in DATA_INFO:
             raise ValueError(f'Dataset [{id_name}] is not supported')
-
+     
         # get data preprocessor
         if preprocessor is None:
             preprocessor = get_default_preprocessor(id_name, att=True)
@@ -117,7 +118,6 @@ class AttackDataset:
 
         preprocessor = get_default_preprocessor(id_name, att=True)
 
-       
         tmp = default_preprocessing_dict[id_name]['normalization']
         normalize = {'mean':tmp[0], 'std':tmp[1]}
 
@@ -229,13 +229,12 @@ class AttackDataset:
             logits = fmodel(data)
             preds = logits.argmax(1)
 
-            # breakpoint()
-
             total_samples += len(label)
             correct_predicted += (label==preds).cpu().sum().item()
 
-            print(data[0])
-            print(correct_predicted)
+            if args.debug:
+                print(data[0])
+                print(correct_predicted)
 
             if args.att in DEEPFOOL:
                 raw_advs, clipped_advs, success = attack(fmodel, data, label, epsilons=args.eps)
@@ -271,7 +270,7 @@ class AttackDataset:
                 # label = lab_batch[it].cpu().item()
 
                 image_pil_adv = trn.ToPILImage()(clipped_adv)
-                # image_pil_adv.save(os.path.join(attack_path, f'{lines[counter].split("/")[-1].split(".")[0]}.png'))
+                image_pil_adv.save(os.path.join(attack_path, f'{lines[counter].split("/")[-1].split(".")[0]}.png'))
                 counter += 1
         # except Exception as e:
         #     print("An exception occurred:", str(e))

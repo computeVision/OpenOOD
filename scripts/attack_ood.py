@@ -57,6 +57,7 @@ parser.add_argument("--att",  default="pgd", choices=[None, 'fgsm', 'bim', 'pgd'
 parser.add_argument("--bpda",  default=False, type=str2bool, help="")
 parser.add_argument("--eps",  default="4/255", help="")
 parser.add_argument("--norm",  default="Linf", choices=['Linf', 'L2', 'L1'], help="")
+parser.add_argument("--debug",  default=False, type=str2bool, help="")
 args = parser.parse_args()
 
 root = args.root
@@ -154,15 +155,15 @@ for subfolder in sorted(glob(os.path.join(root, 's*'))):
     net.eval()
 
 
-    attackdataset = AttackDataset(
-        net,
-        id_name=args.id_data,  # the target ID dataset
-        data_root=os.path.join(ROOT_DIR, 'data'),
-        config_root=os.path.join(ROOT_DIR, 'configs'),
-        preprocessor=None,  # default preprocessing
-        batch_size=args.
-        batch_size,  # for certain methods the results can be slightly affected by batch size
-        shuffle=False,
-        num_workers=8)
+attackdataset = AttackDataset(
+    net,
+    id_name=args.id_data,  # the target ID dataset
+    data_root=os.path.join(ROOT_DIR, 'data'),
+    config_root=os.path.join(ROOT_DIR, 'configs'),
+    preprocessor=None,  # default preprocessing
+    batch_size=args.
+    batch_size,  # for certain methods the results can be slightly affected by batch size
+    shuffle=False,
+    num_workers=8)
 
-    attackdataset.run_attack(args)
+attackdataset.run_attack(args)
