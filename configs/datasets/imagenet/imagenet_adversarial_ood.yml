@@ -12,26 +12,14 @@ ood_dataset:
   num_workers: '@{num_workers}'
   num_gpus: '@{num_gpus}'
   num_machines: '@{num_machines}'
-  split_names: [val, nearood, farood]
-  val:
-    data_dir: ./data/images_largescale/
-    imglist_pth: ./data/benchmark_imglist/imagenet/val_openimage_o.txt
+  split_names: [nearood, farood]
   nearood:
-    datasets: [ssb_hard, ninco]
-    ssb_hard:
+    datasets: [pgd]
+    pgd:
       data_dir: ./data/images_largescale/
-      imglist_pth: ./data/benchmark_imglist/imagenet/test_ssb_hard.txt
-    ninco:
-      data_dir: ./data/images_largescale/
-      imglist_pth: ./data/benchmark_imglist/imagenet/test_ninco.txt
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_pgd_resnet50_imagenet.txt
   farood:
-    datasets: [inaturalist, textures, openimageo]
-    textures:
-      data_dir: ./data/images_classic/
-      imglist_pth: ./data/benchmark_imglist/imagenet/test_textures.txt
-    inaturalist:
+    datasets: [masked_pgd]
+    masked_pgd:
       data_dir: ./data/images_largescale/
-      imglist_pth: ./data/benchmark_imglist/imagenet/test_inaturalist.txt
-    openimageo:
-      data_dir: ./data/images_largescale/
-      imglist_pth: ./data/benchmark_imglist/imagenet/test_openimage_o.txt
+      imglist_pth: ./data/benchmark_imglist/imagenet/test_masked_pgd_resnet50_imagenet.txt

@@ -440,13 +440,6 @@ def get_id_ood_dataloader(id_name, data_root, preprocessor, att=False, **loader_
     test_standard_preprocessor = get_default_preprocessor(id_name)
 
     if att:
-        from torchvision import transforms as trn
-        preprocessor = trn.Compose([
-            trn.Resize(256),
-            trn.CenterCrop(224),
-            trn.ToTensor()
-        ])
-
         test_standard_preprocessor = get_default_preprocessor(id_name, att=True)
 
     dataloader_dict = {}

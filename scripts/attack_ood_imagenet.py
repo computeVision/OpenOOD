@@ -23,7 +23,6 @@ from openood.networks.godin_net import GodinNet
 from openood.networks.rot_net import RotNet
 from openood.networks.cider_net import CIDERNet
 
-
 from openood.attacks.misc import (
     args_handling,
     print_args,
@@ -34,7 +33,6 @@ from openood.attacks.misc import (
     create_log_file,
     save_log
 )
-
 
 def update(d, u):
     for k, v in u.items():
@@ -52,10 +50,6 @@ parser.add_argument('--arch',
 parser.add_argument('--tvs-version', default=1, choices=[1, 2])
 parser.add_argument('--ckpt-path', default=None)
 parser.add_argument('--tvs-pretrained', action='store_true')
-# parser.add_argument('--postprocessor', default='msp')
-# parser.add_argument('--save-csv', action='store_true')
-# parser.add_argument('--save-score', action='store_true')
-# parser.add_argument('--fsood', action='store_true')
 parser.add_argument('--batch-size', default=200, type=int)
 
 parser.add_argument("--att",  default="pgd", choices=[None, 'fgsm', 'bim', 'pgd', 'df', 'cw', 'masked_pgd'], help="")
@@ -128,17 +122,12 @@ else:
 net.cuda()
 net.eval()
 
-normalize = {'mean':[0.485, 0.456, 0.406], 'std':[0.229, 0.224, 0.225]}
-
 attackdataset = AttackDataset(
     net,
     id_name='imagenet',  # the target ID dataset
     data_root=os.path.join(ROOT_DIR, 'data'),
     config_root=os.path.join(ROOT_DIR, 'configs'),
     preprocessor=preprocessor,  # default preprocessing
-    normalize=normalize,
-    # postprocessor_name=postprocessor_name,
-    # postprocessor=postprocessor,
     batch_size=args.
     batch_size,  # for certain methods the results can be slightly affected by batch size
     shuffle=False,
