@@ -98,7 +98,9 @@ class AttackDataset:
             raise ValueError(f'Dataset [{id_name}] is not supported')
      
         # get data preprocessor
-        if preprocessor is None:
+        if preprocessor is None and id_name == 'imagenet200':
+            preprocessor = get_default_preprocessor(id_name, att=False)
+        elif preprocessor is None:
             preprocessor = get_default_preprocessor(id_name, att=True)
 
         # set up config root
@@ -206,7 +208,7 @@ class AttackDataset:
             attack_path = os.path.join(self.data_root, 'images_classic', 'cifar100' + '_' + args.att + '_' + args.arch, 'test')
             img_list = "benchmark_imglist/cifar100/test_cifar100.txt"
         elif self.id_name == 'imagenet200':
-            attack_path = os.path.join(self.data_root, 'images_largescale', 'imagenet_1k' + '_' + args.att + '_' + args.arch, 'val')
+            attack_path = os.path.join(self.data_root, 'images_largescale', 'imagenet200' + '_' + args.att + '_' + args.arch, 'val')
             img_list = "benchmark_imglist/imagenet200/test_imagenet200.txt"
         create_dir(attack_path)
 
