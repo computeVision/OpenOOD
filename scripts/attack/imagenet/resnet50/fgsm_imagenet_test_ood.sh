@@ -19,7 +19,7 @@
 python scripts/attack_ood_imagenet.py \
     --tvs-pretrained \
     --arch resnet50 \
-    --att masked_pgd \
+    --att fgsm \
     --batch-size 50
     # --postprocessor scale \
     # --save-score --save-csv --fsood

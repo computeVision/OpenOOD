@@ -249,7 +249,7 @@ class AttackDataset:
             #         clipped_advs, y_, max_nr, success = adv_complete[ args.att ]
             
             if args.att == 'masked_pgd':
-                clipped_advs, success = masked_pgd_attack(norm_model, data, label, epsilon=1, alpha=0.01, num_steps=40, patch_size=60)
+                clipped_advs, success = masked_pgd_attack(norm_model, data, label, epsilon=1, alpha=0.01, num_steps=40, patch_size=args.masked_patch_size)
             
             if args.att == 'eot_pgd':
                 clipped_advs = attack(data, label)
@@ -266,7 +266,6 @@ class AttackDataset:
             successful_attacked += success.sum().item()
 
             for it, suc in enumerate(success):
-                    
                 clipped_adv = clipped_advs[it].cpu()
                 # img_benign = img_batch[it].cpu()
                 # label = lab_batch[it].cpu().item()
