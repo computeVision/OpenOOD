@@ -269,9 +269,15 @@ class AttackDataset:
                 clipped_adv = clipped_advs[it].cpu()
                 # img_benign = img_batch[it].cpu()
                 # label = lab_batch[it].cpu().item()
-
+        
                 image_pil_adv = trn.ToPILImage()(clipped_adv)
-                image_pil_adv.save(os.path.join(attack_path, f'{lines[counter].split("/")[-1].split(".")[0]}.png'))
+                if "cifar10" in self.id_name or "cifar100" in self.id_name:
+                    parse = "/".join(lines[counter].split("/")[2:]).split(" ")[0]
+                    create_dir(os.path.join(attack_path, parse.split("/")[0]))
+                    image_pil_adv.save(os.path.join(attack_path, f'{parse}'))
+                else:
+                    parse = lines[counter].split("/")[-1].split(".")[0]
+                    image_pil_adv.save(os.path.join(attack_path, f'{parse}.png'))
                 counter += 1
         # except Exception as e:
         #     print("An exception occurred:", str(e))

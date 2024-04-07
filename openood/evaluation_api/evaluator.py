@@ -106,6 +106,7 @@ class Evaluator:
             'shuffle': shuffle,
             'num_workers': num_workers
         }
+
         dataloader_dict = get_id_ood_dataloader(id_name, data_root,
                                                 preprocessor, **loader_kwargs)
 

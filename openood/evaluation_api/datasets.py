@@ -32,6 +32,209 @@ DATA_INFO = {
             }
         },
         'csid': {
+            'datasets': [],
+        },
+        'ood': {
+            'val': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/val_tin.txt'
+            }, 
+            'near': {
+                'datasets': ['pgd', 'fgsm', 'df'], 
+                'pgd': {
+                    'data_dir': 'images_classic/',
+                    'imglist_path': 'benchmark_imglist/cifar10/test_pgd_ResNet18_32x32_cifar10.txt'
+                    },
+                'fgsm': {
+                    'data_dir': 'images_classic/',
+                    'imglist_path': 'benchmark_imglist/cifar10/test_fgsm_ResNet18_32x32_cifar10.txt'
+                    },
+                'df': {
+                    'data_dir': 'images_classic/',
+                    'imglist_path': 'benchmark_imglist/cifar10/test_df_ResNet18_32x32_cifar10.txt'
+                    }
+            },
+            'far': {
+                'datasets': ['masked_pgd'],
+                'masked_pgd': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/test_masked_pgd_ResNet18_32x32_cifar10.txt'
+                }
+            }
+        }
+    },
+    'cifar100': {
+        'num_classes': 100,
+        'id': {
+            'train': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar100/train_cifar100.txt'
+            },
+            'val': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar100/val_cifar100.txt'
+            },
+            'test': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar100/test_cifar100.txt'
+            }
+        },
+        'csid': {
+            'datasets': [],
+        },
+        'ood': {
+            'val': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar100/val_tin.txt'
+            }, 
+            'near': {
+                'datasets': ['pgd', 'fgsm', 'df'], 
+                'pgd': {
+                    'data_dir': 'images_classic/',
+                    'imglist_path': 'benchmark_imglist/cifar100/test_pgd_ResNet18_32x32_cifar100.txt'
+                    },
+                'fgsm': {
+                    'data_dir': 'images_classic/',
+                    'imglist_path': 'benchmark_imglist/cifar100/test_fgsm_ResNet18_32x32_cifar100.txt'
+                    },
+                'df': {
+                    'data_dir': 'images_classic/',
+                    'imglist_path': 'benchmark_imglist/cifar100/test_df_ResNet18_32x32_cifar100.txt'
+                    }
+            },
+            'far': {
+                'datasets': ['masked_pgd'],
+                'masked_pgd': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar100/test_masked_pgd_ResNet18_32x32_cifar100.txt'
+                }
+            }
+        }
+    },
+    'imagenet200': {
+        'num_classes': 200,
+        'id': {
+            'train': {
+                'data_dir':
+                'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/train_imagenet200.txt'
+            },
+            'val': {
+                'data_dir': 'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/val_imagenet200.txt'
+            },
+            'test': {
+                'data_dir':
+                'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/test_imagenet200.txt'
+            }
+        },
+        'csid': {
+            'datasets': [],
+        },
+        'ood': {
+            'val': {
+                'data_dir': 'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/val_openimage_o.txt'
+            }, 
+            'near': {
+                'datasets': ['pgd', 'fgsm', 'df'],
+                'pgd': {
+                    'data_dir': 'images_largescale/',
+                    'imglist_path': 'benchmark_imglist/imagenet200/test_pgd_ResNet18_224x224_imagenet200.txt'
+                    },
+                'fgsm': {
+                    'data_dir': 'images_largescale/',
+                    'imglist_path': 'benchmark_imglist/imagenet200/test_fgsm_ResNet18_224x224_imagenet200.txt'
+                    },
+                'df': {
+                    'data_dir': 'images_largescale/',
+                    'imglist_path': 'benchmark_imglist/imagenet200/test_df_ResNet18_224x224_imagenet200.txt'
+                    }
+            },
+            'far': {
+                'datasets': ['masked_pgd'],
+                'masked_pgd': {
+                'data_dir': 'images_largescale/',
+                'imglist_path': 'benchmark_imglist/imagenet200/test_masked_pgd_ResNet18_224x224_imagenet200.txt'
+                }
+            }
+        }
+    },
+    'imagenet': {
+        'num_classes': 1000,
+        'id': {
+            'train': {
+                'data_dir': 'images_largescale/',
+                'imglist_path': 'benchmark_imglist/imagenet/train_imagenet.txt'
+            },
+            'val': {
+                'data_dir': 'images_largescale/',
+                'imglist_path': 'benchmark_imglist/imagenet/val_imagenet.txt'
+            },
+            'test': {
+                'data_dir': 'images_largescale/',
+                'imglist_path': 'benchmark_imglist/imagenet/test_imagenet.txt'
+            }
+        },
+        'csid': {
+            'datasets': [],
+        },
+        'ood': {
+            'val': {
+                'data_dir': 'images_largescale/',
+                'imglist_path': 'benchmark_imglist/imagenet/val_openimage_o.txt'
+            },
+            'near': {
+                'datasets': ['pgd', 'fgsm', 'df'],
+                'pgd': {
+                    'data_dir': 'images_largescale/',
+                    'imglist_path': 'benchmark_imglist/imagenet/test_pgd_resnet50_imagenet.txt'
+                    },
+                'fgsm': {
+                    'data_dir': 'images_largescale/',
+                    'imglist_path': 'benchmark_imglist/imagenet/test_fgsm_resnet50_imagenet.txt'
+                    },
+                'df': {
+                    'data_dir': 'images_largescale/',
+                    'imglist_path': 'benchmark_imglist/imagenet/test_df_resnet50_imagenet.txt'
+                    }
+            },
+            'far': {
+                'datasets': ['masked_pgd'],
+                'masked_pgd': {
+                'data_dir': 'images_largescale/',
+                'imglist_path': 'benchmark_imglist/imagenet/test_masked_pgd_resnet50_imagenet.txt'
+                }
+            }
+        }
+
+    }
+}
+
+"""
+DATA_INFO = {
+    'cifar10': {
+        'num_classes': 10,
+        'id': {
+            'train': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/train_cifar10.txt'
+            },
+            'val': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/val_cifar10.txt'
+            },
+            'test': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/test_cifar10.txt'
+            }
+        },
+        'csid': {
             'datasets': ['cifar10c'],
             'cinic10': {
                 'data_dir': 'images_classic/',
@@ -301,6 +504,7 @@ DATA_INFO = {
         }
     },
 }
+"""
 
 download_id_dict = {
     'cifar10': '1Co32RiiWe16lTaiOU6JMMnyUYS41IlO1',

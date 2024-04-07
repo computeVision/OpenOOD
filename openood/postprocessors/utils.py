@@ -40,6 +40,8 @@ from .vim_postprocessor import VIMPostprocessor
 from .rts_postprocessor import RTSPostprocessor
 from .gen_postprocessor import GENPostprocessor
 from .relation_postprocessor import RelationPostprocessor
+from .scale_postprocessor import ScalePostprocessor
+from .nnguide_postprocessor import NNGuidePostprocessor
 
 
 def get_postprocessor(config: Config):
@@ -83,7 +85,9 @@ def get_postprocessor(config: Config):
         'rotpred': RotPredPostprocessor,
         'rankfeat': RankFeatPostprocessor,
         'gen': GENPostprocessor,
-        'relation': RelationPostprocessor
+        'relation': RelationPostprocessor,
+        'scale': ScalePostprocessor,
+        'nnguide': NNGuidePostprocessor
     }
 
     return postprocessors[config.postprocessor.name](config)

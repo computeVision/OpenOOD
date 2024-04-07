@@ -18,18 +18,4 @@ python main.py \
     configs/pipelines/test/test_ood.yml \
     configs/preprocessors/base_preprocessor.yml \
     configs/postprocessors/relation.yml \
-    --num_workers 8 \
-    --network.checkpoint 'results/cifar10_resnet18_32x32_base_e100_lr0.1_default/s0/best.ckpt' \
-    --mark 0
-
-############################################
-# alternatively, we recommend using the
-# new unified, easy-to-use evaluator with
-# the example script scripts/eval_ood.py
-# especially if you want to get results from
-# multiple runs
-python scripts/eval_ood.py \
-   --id-data cifar10 \
-   --root ./results/cifar10_resnet18_32x32_base_e100_lr0.1_default \
-   --postprocessor relation \
-   --save-score --save-csv
+    --num_workers 8 \ j 
