@@ -1,6 +1,7 @@
 import os
 import gdown
 import zipfile
+from torchvision import transforms as trn
 
 from torch.utils.data import DataLoader
 import torchvision as tvs
@@ -701,9 +702,24 @@ def get_id_ood_dataloader(id_name, data_root, preprocessor, att=False, **loader_
             dataloader_dict['ood'][split] = dataloader
         else:
             # dataloaders for nearood, farood
+            if 'imagenet' in id_name:
+                preprocessor_ood = trn.Compose([
+                    # trn.Resize(256),
+                    # trn.CenterCrop(224),
+                    trn.ToTensor(),
+                    trn.Normalize(mean=[0.485, 0.456, 0.406],
+                                std=[0.229, 0.224, 0.225])
+                ])
+
             sub_dataloader_dict = {}
             for dataset_name in split_config['datasets']:
                 dataset_config = split_config[dataset_name]
+
+                if dataset_name in ['pgd', 'fgsm', 'df', 'masked_pgd']
+                    prepr = preprocessor_ood
+                else:
+                    prepr = preprocessor
+
                 dataset = ImglistDataset(
                     name='_'.join((id_name, 'ood', dataset_name)),
                     imglist_pth=os.path.join(data_root,
@@ -711,7 +727,7 @@ def get_id_ood_dataloader(id_name, data_root, preprocessor, att=False, **loader_
                     data_dir=os.path.join(data_root,
                                           dataset_config['data_dir']),
                     num_classes=data_info['num_classes'],
-                    preprocessor=preprocessor,
+                    preprocessor=prepr,
                     data_aux_preprocessor=test_standard_preprocessor)
                 dataloader = DataLoader(dataset, **loader_kwargs)
                 sub_dataloader_dict[dataset_name] = dataloader

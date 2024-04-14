@@ -5,7 +5,7 @@ posthocs=(msp mds mds_ensemble gram ebo rmds gradnorm react mls klm sem vim knn 
 
 for iter in "${posthocs[@]}"; do
     echo "$iter"
-    python scripts/eval_ood_imagenet.py \
+    python scripts/eval_ood_adversarial_imagenet.py \
         --tvs-pretrained \
         --arch vit-b-16 \
         --postprocessor "$iter" \

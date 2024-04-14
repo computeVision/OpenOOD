@@ -12,7 +12,7 @@ posthocs=(nnguide)
 
 for iter in "${posthocs[@]}"; do
     echo "$iter"
-    python scripts/eval_ood.py \
+    python scripts/eval_adversarial_ood.py \
         --id-data cifar100 \
         --root ./results/cifar100_resnet18_32x32_base_e100_lr0.1_default \
         --postprocessor "$iter" \

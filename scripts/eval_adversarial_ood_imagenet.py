@@ -44,7 +44,7 @@ parser.add_argument('--postprocessor', default='msp')
 parser.add_argument('--save-csv', action='store_true')
 parser.add_argument('--save-score', action='store_true')
 parser.add_argument('--fsood', action='store_true')
-parser.add_argument('--batch-size', default=200, type=int)
+parser.add_argument('--batch-size', default=64, type=int)
 args = parser.parse_args()
 
 if not args.tvs_pretrained:
