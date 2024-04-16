@@ -65,6 +65,7 @@ link_prefix = 'https://raw.githubusercontent.com/Jingkang50/OpenOOD/main/configs
 def get_postprocessor(config_root: str, postprocessor_name: str, id_data_name: str):
     postprocessor_config_path = os.path.join(config_root, 'postprocessors',
                                              f'{postprocessor_name}.yml')
+    # breakpoint()
     if not os.path.exists(postprocessor_config_path):
         os.makedirs(os.path.dirname(postprocessor_config_path), exist_ok=True)
         urllib.request.urlretrieve(link_prefix + f'{postprocessor_name}.yml',

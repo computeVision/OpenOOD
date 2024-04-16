@@ -192,6 +192,7 @@ for i in range(len(metrics_mean)):
     final_metrics.append(temp)
 df = pd.DataFrame(final_metrics, index=metrics.index, columns=metrics.columns)
 
+
 if args.save_csv:
     saving_root = os.path.join(root, 'ood' if not args.fsood else 'fsood')
     if not os.path.exists(saving_root):

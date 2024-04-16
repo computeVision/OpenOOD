@@ -33,7 +33,15 @@ DATA_INFO = {
             }
         },
         'csid': {
-            'datasets': [],
+            'datasets': ['cifar10c'],
+            'cinic10': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/val_cinic10.txt'
+            },
+            'cifar10c': {
+                'data_dir': 'images_classic/',
+                'imglist_path': 'benchmark_imglist/cifar10/test_cifar10c.txt'
+            }
         },
         'ood': {
             'val': {
@@ -134,7 +142,25 @@ DATA_INFO = {
             }
         },
         'csid': {
-            'datasets': [],
+            'datasets': ['imagenet_v2', 'imagenet_c', 'imagenet_r'],
+            'imagenet_v2': {
+                'data_dir':
+                'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/test_imagenet200_v2.txt'
+            },
+            'imagenet_c': {
+                'data_dir':
+                'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/test_imagenet200_c.txt'
+            },
+            'imagenet_r': {
+                'data_dir':
+                'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet200/test_imagenet200_r.txt'
+            },
         },
         'ood': {
             'val': {
@@ -183,7 +209,22 @@ DATA_INFO = {
             }
         },
         'csid': {
-            'datasets': [],
+            'datasets': ['imagenet_v2', 'imagenet_c', 'imagenet_r'],
+            'imagenet_v2': {
+                'data_dir': 'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet/test_imagenet_v2.txt'
+            },
+            'imagenet_c': {
+                'data_dir': 'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet/test_imagenet_c.txt'
+            },
+            'imagenet_r': {
+                'data_dir': 'images_largescale/',
+                'imglist_path':
+                'benchmark_imglist/imagenet/test_imagenet_r.txt'
+            },
         },
         'ood': {
             'val': {
@@ -714,8 +755,7 @@ def get_id_ood_dataloader(id_name, data_root, preprocessor, att=False, **loader_
             sub_dataloader_dict = {}
             for dataset_name in split_config['datasets']:
                 dataset_config = split_config[dataset_name]
-
-                if dataset_name in ['pgd', 'fgsm', 'df', 'masked_pgd']
+                if 'imagenet' in id_name and dataset_name in ['pgd', 'fgsm', 'df', 'masked_pgd']:
                     prepr = preprocessor_ood
                 else:
                     prepr = preprocessor
