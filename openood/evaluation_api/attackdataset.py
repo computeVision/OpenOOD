@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from torchvision import transforms as trn
+from torchvision import transforms
 from tqdm import tqdm
 import time
 from datetime import datetime
@@ -21,7 +22,7 @@ from .datasets import DATA_INFO, data_setup, get_id_ood_dataloader
 from .postprocessor import get_postprocessor
 from .preprocessor import get_default_preprocessor
 from .preprocessor import default_preprocessing_dict
-
+from foolbox.criteria import Misclassification
 
 from openood.attacks.misc import (
     args_handling,
@@ -38,8 +39,32 @@ import eagerpy as ep
 from foolbox import PyTorchModel, accuracy, samples
 import foolbox.attacks as fa
 
+from pytorch_grad_cam import GradCAM, HiResCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image, preprocess_image
+
+home = os.getenv('HOME')
+
 DEEPFOOL   = ['fgsm', 'bim', 'pgd', 'df', 'cw'] + ['pgd_bpda']
 AUTOATTACK = ['aa', 'apgd-ce', 'square']
+
+class ModelWrapper:
+    def __init__(self, model, mean, std):
+        self.model = model
+        self.normalization = transforms.Normalize(mean, std)
+
+    def normalize_input(self, input_data):
+        # Apply the stored normalization to the input data
+        normalized_input = self.normalization(input_data)
+        return normalized_input
+
+    def __getattr__(self, attr):
+        # Delegate attribute access to the original model
+        return getattr(self.model, attr)
+
+    def __call__(self, input_data):
+        normalized_input = self.normalize_input(input_data)
+        return self.model(normalized_input)
 
 
 class AttackDataset:
@@ -96,7 +121,7 @@ class AttackDataset:
         # # check the arguments
         if id_name not in DATA_INFO:
             raise ValueError(f'Dataset [{id_name}] is not supported')
-     
+
         # get data preprocessor
         if preprocessor is None and id_name == 'imagenet200':
             preprocessor = get_default_preprocessor(id_name, att=False)
@@ -163,13 +188,36 @@ class AttackDataset:
         self.net.eval()
 
 
+    def predict(self, model, input_batch, labels):
+        logits = model(input_batch)
+        # Get the predicted class label
+        predictions = logits.argmax(-1)
+
+        accuracy = (predictions == labels).cpu().float().mean().item()
+        print("accuracy", accuracy)
+        return predictions
+
+
     def run_attack(self, args):
+        
+        predictions = {}
+        xaimaps = {}
+
+        xaimaps_ben = []
+        xaimaps_pgd = []
+
+        predictions_gt  = []
+        predictions_ben = []
+        predictions_pgd = []
+
         self.net.eval()
         # seed = 1111
         # Note: accuracy may slightly decrease, depending on seed
         # torch.manual_seed(seed)
         preprocessing = dict(mean=self.normalize['mean'], std=self.normalize['std'], axis=-3)
         fmodel = PyTorchModel(self.net, bounds=(0, 1), preprocessing=preprocessing)
+        model2 = ModelWrapper(self.net, mean=self.normalize['mean'], std=self.normalize['std'])
+
 
         if args.att == 'fgsm':
             attack = fa.FGSM()
@@ -194,7 +242,7 @@ class AttackDataset:
         #     if args.version == 'custom':
         #         adversary.attacks_to_run = [ args.att ]
         #     adversary.seed = 0 # every attack is seeded by 0. Otherwise, it would be randomly seeded for each attack.
-        elif args.att == 'masked_pgd':
+        elif args.att == 'mpgd':
             from openood.attacks import masked_pgd_attack, NormalizeWrapper
             norm_model = NormalizeWrapper(self.net, self.normalize['mean'], self.normalize['std'])
 
@@ -224,46 +272,59 @@ class AttackDataset:
         correct_predicted = 0
         successful_attacked = 0
 
+        attacked_target = dict()
+        attacked_target["labels"] = []
+        attacked_target["correct_predicted"] = 0
+        attacked_target["success_full_attacked_target"] = []
+        attacked_target["attacked_prediction"] = []
+        attacked_target[args.att] = []
+
         # try:
         for batch in tqdm(self.dataloader_dict['id']['test'], desc="attack", disable=not True):
             data = batch['data'].cuda()
-            label = batch['label'].cuda()
-            logits = fmodel(data)
-            preds = logits.argmax(1)
+            labels = batch['label'].cuda()
+            preds = self.predict(fmodel, data, labels)
+            total_samples += len(labels)
+            correct_predicted += (labels==preds).cpu().sum().item()
 
-            total_samples += len(label)
-            correct_predicted += (label==preds).cpu().sum().item()
+            attacked_target["labels"].append(labels.cpu())
+            # attacked_target["correct_predicted"].append(correct_predicted)
 
             if args.debug:
                 print(data[0])
                 print(correct_predicted)
 
             if args.att in DEEPFOOL:
-                raw_advs, clipped_advs, success = attack(fmodel, data, label, epsilons=args.eps)
+                raw_advs, clipped_advs, success = attack(fmodel, data, criterion=Misclassification(labels), epsilons=args.eps)
 
             # if args.att in AUTOATTACK:
             #     if args.version == 'standard':
-            #         clipped_advs, y_, max_nr, success = adversary.run_standard_evaluation(data, label, bs=args.bs, return_labels=True)
+            #         clipped_advs, y_, max_nr, success = adversary.run_standard_evaluation(data, labels, bs=args.bs, return_labels=True)
             #     else: 
-            #         adv_complete = adversary.run_standard_evaluation_individual(data, label, bs=args.bs, return_labels=True)
+            #         adv_complete = adversary.run_standard_evaluation_individual(data, label, bs=args.bs, return_labelss=True)
             #         clipped_advs, y_, max_nr, success = adv_complete[ args.att ]
             
-            if args.att == 'masked_pgd':
-                clipped_advs, success = masked_pgd_attack(norm_model, data, label, epsilon=1, alpha=0.01, num_steps=40, patch_size=args.masked_patch_size)
+            if args.att == 'mpgd':
+                clipped_advs, success = masked_pgd_attack(norm_model, data, labels, epsilon=1, alpha=0.01, num_steps=40, patch_size=args.masked_patch_size)
             
             if args.att == 'eot_pgd':
-                clipped_advs = attack(data, label)
+                clipped_advs = attack(data, labels)
                 pred = torch.max(fmodel(clipped_advs),dim=1)[1]
-                success = ~(pred == label)
+                success = ~(pred == labels)
 
             if args.att in ['bandits', 'nes']:
                 from blackbox_attacks.bandits import make_adversarial_examples as bandits_attack
-                out = bandits_attack(data, label, args, fmodel, 256)
+                out = bandits_attack(data, labels, args, fmodel, 256)
                 success = out['success_adv']
                 clipped_advs = out['images_adv']
             
             success = success.cpu()
+            attacked_target["success_full_attacked_target"].append(success.cpu())
+
+            att_pred = self.predict(fmodel, clipped_advs, labels)
+            attacked_target["attacked_prediction"].append(att_pred.cpu())
             successful_attacked += success.sum().item()
+            attacked_target[args.att].append(clipped_advs.cpu())
 
             for it, suc in enumerate(success):
                 clipped_adv = clipped_advs[it].cpu()
@@ -271,7 +332,7 @@ class AttackDataset:
                 # label = lab_batch[it].cpu().item()
         
                 image_pil_adv = trn.ToPILImage()(clipped_adv)
-                if "cifar10" in self.id_name or "cifar100" in self.id_name:
+                if self.id_name in ["cifar10", "cifar100"]:
                     parse = "/".join(lines[counter].split("/")[2:]).split(" ")[0]
                     create_dir(os.path.join(attack_path, parse.split("/")[0]))
                     image_pil_adv.save(os.path.join(attack_path, f'{parse}'))
@@ -279,10 +340,32 @@ class AttackDataset:
                     parse = lines[counter].split("/")[-1].split(".")[0]
                     image_pil_adv.save(os.path.join(attack_path, f'{parse}.png'))
                 counter += 1
-        # except Exception as e:
-        #     print("An exception occurred:", str(e))
-        # finally:
+            # except Exception as e:
+            #     print("An exception occurred:", str(e))
+            # finally:
+
+
+            targets = None # [ClassifierOutputTarget(None)]
+            target_layers = [model2.layer4[-1]]
+            with GradCAM(model=model2, target_layers=target_layers) as cam:
+
+                outputs_ben  = cam(input_tensor=data,         targets=targets)
+                outputs_pgd  = cam(input_tensor=clipped_advs, targets=targets)
+
+                # Append xaimaps to the list
+                xaimaps_ben.append(outputs_ben)
+                xaimaps_pgd.append(outputs_pgd)
+
+                # predicted_ben  = predict(model, data, labels)
+                # predicted_pgd  = predict(model, data_pgd, labels)
+
+                # Append predictions to the list
+                predictions_gt.append(labels.cpu())
+                predictions_ben.append(preds.cpu())
+                predictions_pgd.append(att_pred.cpu())
+
         base_pth = os.path.join('./data/attacked', args.att + "_" + self.id_name + "_" + args.arch)
+        # save logs
         create_dir(base_pth)
         log_pth = os.path.join(base_pth, 'logs')
         log = create_log_file(args, log_pth)
@@ -307,3 +390,22 @@ class AttackDataset:
         # log['clean_acc'] = 0 if len(clean_acc_list) == None else round(np.mean(clean_acc_list), 4)
 
         save_log(args, log, log_pth)
+
+
+        xaimaps["ben"] = np.concatenate(xaimaps_ben)
+        xaimaps[args.att] = np.concatenate(xaimaps_pgd)
+        
+        predictions["gt"] = torch.cat(predictions_gt)
+        predictions["ben"] = torch.cat(predictions_ben)
+        predictions[args.att] = torch.cat(predictions_pgd)
+
+        torch.save(xaimaps,     os.path.join(home, f"IWR/OpenOOD/results/xai/gradcams_{args.att}_{self.id_name}_{args.arch}.pt"))
+        torch.save(predictions, os.path.join(home, f"IWR/OpenOOD/results/xai/predictions_{args.att}_{self.id_name}_{args.arch}.pt"))
+
+        # save dictionary
+        attacked_target["correct_predicted"] = correct_predicted
+        attacked_target["labels"] = torch.cat(attacked_target["labels"])
+        attacked_target["success_full_attacked_target"] = torch.cat(attacked_target["success_full_attacked_target"])
+        attacked_target["attacked_prediction"] = torch.cat(attacked_target["attacked_prediction"])
+        attacked_target[args.att] = torch.vstack(attacked_target[args.att])
+        torch.save(attacked_target, os.path.join(base_pth, args.att + "_attacked_target.pth"))

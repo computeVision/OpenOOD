@@ -113,9 +113,9 @@ def require_download(filename, path):
                 item) or path.endswith(filename):
             return False
 
-    else:
-        print(filename + ' needs download:')
-        return True
+        else:
+            print(filename + ' needs download:')
+            return True
 
 
 def download_dataset(dataset, args):

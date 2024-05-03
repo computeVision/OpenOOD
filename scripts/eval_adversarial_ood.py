@@ -74,7 +74,9 @@ if len(glob(os.path.join(root, 's*'))) == 0:
 
 # iterate through training runs
 all_metrics = []
-for subfolder in sorted(glob(os.path.join(root, 's*'))):
+# subfolder = glob(os.path.join(root, 's*'))
+subfolders = glob(os.path.join(root, 's2')) # todo expand to calculate variations
+for subfolder in sorted(subfolders):
     # load pre-setup postprocessor if exists
     if os.path.isfile(
             os.path.join(subfolder, 'postprocessors',

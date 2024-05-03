@@ -6,29 +6,31 @@
 # node=73
 # jobname=openood
 
-posthocs=(
-    msp 
-    mds 
-    mds_ensemble 
-    gram 
-    ebo 
-    rmds 
-    gradnorm 
-    react 
-    mls 
-    klm 
-    gmm 
-    vim 
-    knn 
-    dice 
-    rankfeat 
-    ash 
-    she 
-    gen 
-    nnguide 
-    relation 
-    scale
-    )
+# posthocs=(
+#     msp 
+#     mds 
+#     mds_ensemble 
+#     gram 
+#     ebo 
+#     rmds 
+#     gradnorm 
+#     react 
+#     mls 
+#     klm 
+#     gmm 
+#     vim 
+#     knn 
+#     dice 
+#     rankfeat 
+#     ash 
+#     she 
+#     gen 
+#     nnguide 
+#     relation 
+#     scale
+#     )
+
+posthocs=( odin ) 
 
 for iter in "${posthocs[@]}"; do
     echo "$iter"

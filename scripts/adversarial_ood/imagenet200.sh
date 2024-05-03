@@ -1,29 +1,31 @@
 #!/bin/bash
 # sh scripts/adversarial_ood/imagenet200.sh
 
-posthocs=(
-    # msp 
-    # mds 
-    # mds_ensemble 
-    # gram 
-    ebo 
-    rmds 
-    gradnorm 
-    react 
-    mls 
-    klm 
-    sem 
-    vim 
-    knn 
-    dice 
-    rankfeat 
-    ash 
-    she 
-    gen 
-    nnguide 
-    relation 
-    scale
-    )
+# posthocs=(
+#     # msp 
+#     # mds 
+#     # mds_ensemble 
+#     # gram 
+#     ebo 
+#     rmds 
+#     gradnorm 
+#     react 
+#     mls 
+#     klm 
+#     sem 
+#     vim 
+#     knn 
+#     dice 
+#     rankfeat 
+#     ash 
+#     she 
+#     gen 
+#     nnguide 
+#     relation 
+#     scale
+#     )
+
+posthocs=( odin ) 
 
 for iter in "${posthocs[@]}"; do
     echo "$iter"

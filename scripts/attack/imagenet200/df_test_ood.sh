@@ -12,6 +12,6 @@ python scripts/attack_ood.py \
    --root ./results/imagenet200_resnet18_224x224_base_e90_lr0.1_default \
    --att df \
    --eps "4/255" \
-   --batch-size 100
+   --batch-size 64
    
 

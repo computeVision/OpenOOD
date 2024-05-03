@@ -34,7 +34,6 @@ from openood.attacks.misc import (
     save_log
 )
 
-
 def update(d, u):
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
@@ -42,7 +41,6 @@ def update(d, u):
         else:
             d[k] = v
     return d
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--root', required=True)
@@ -53,7 +51,7 @@ parser.add_argument(
     default='cifar10',
     choices=['cifar10', 'cifar100', 'aircraft', 'cub', 'imagenet200'])
 parser.add_argument('--batch-size', type=int, default=200)
-parser.add_argument("--att",  default="pgd", choices=[None, 'fgsm', 'bim', 'pgd', 'df', 'cw', 'masked_pgd'], help="")
+parser.add_argument("--att",  default="pgd", choices=[None, 'fgsm', 'bim', 'pgd', 'df', 'cw', 'mpgd'], help="")
 parser.add_argument("--bpda",  default=False, type=str2bool, help="")
 parser.add_argument("--eps",  default="4/255", help="")
 parser.add_argument("--norm",  default="Linf", choices=['Linf', 'L2', 'L1'], help="")
@@ -102,7 +100,10 @@ if len(glob(os.path.join(root, 's*'))) == 0:
 
 # iterate through training runs
 all_metrics = []
-for subfolder in sorted(glob(os.path.join(root, 's*'))):
+# subfolders = glob(os.path.join(root, 's*'))
+# todo expand to variation
+subfolders = glob(os.path.join(root, 's2')) # just take the last model, todo
+for subfolder in sorted(subfolders):
     # load pre-setup postprocessor if exists
     if os.path.isfile(
             os.path.join(subfolder, 'postprocessors',
@@ -150,7 +151,7 @@ for subfolder in sorted(glob(os.path.join(root, 's*'))):
                       num_classes=num_classes)
     else:
         net = model_arch(num_classes=num_classes)
-
+    
     net.load_state_dict(
         torch.load(os.path.join(subfolder, 'best.ckpt'), map_location='cpu'))
     net.cuda()

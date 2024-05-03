@@ -2,7 +2,7 @@
 # sh scripts/adversarial_ood/imagenet_vit_b.sh
 
 # ensemble is sem?
-posthocs=(
+# posthocs=(
     # msp 
     # mds 
     # mds_ensemble 
@@ -24,7 +24,9 @@ posthocs=(
     # nnguide 
     # relation 
     # scale
-    )
+    # )
+
+posthocs=( odin ) 
 
 # sem --> gmm
 # rankfeat: AttributeError: 'ViT_B_16' object has no attribute 'intermediate_forward'

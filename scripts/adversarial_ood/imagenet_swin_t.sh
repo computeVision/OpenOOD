@@ -1,28 +1,30 @@
 #!/bin/bash
 # sh scripts/adversarial_ood/swint_t.sh
 
-posthocs=(
-    # msp 
-    # mds 
-    mds_ensemble 
-    gram 
-    # ebo 
-    # rmds 
-    # gradnorm 
-    # react 
-    # mls 
-    # klm 
-    # vim 
-    # knn 
-    # dice 
-    rankfeat 
-    # ash 
-    # she 
-    # gen 
-    # nnguide 
-    # relation 
-    # scale
-    )
+# posthocs=(
+#     # msp 
+#     # mds 
+#     mds_ensemble 
+#     gram 
+#     # ebo 
+#     # rmds 
+#     # gradnorm 
+#     # react 
+#     # mls 
+#     # klm 
+#     # vim 
+#     # knn 
+#     # dice 
+#     rankfeat 
+#     # ash 
+#     # she 
+#     # gen 
+#     # nnguide 
+#     # relation 
+#     # scale
+#     )
+
+posthocs=( odin ) 
 
 # mds_ensemble --> TypeError: forward() got an unexpected keyword argument 'return_feature_list'
 # gram --> TypeError: forward() got an unexpected keyword argument 'return_feature_list'
