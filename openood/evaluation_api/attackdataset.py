@@ -344,11 +344,21 @@ class AttackDataset:
             #     print("An exception occurred:", str(e))
             # finally:
 
-
+            print("Arch: ", args.arch)
             targets = None # [ClassifierOutputTarget(None)]
-            target_layers = [model2.layer4[-1]]
-            with GradCAM(model=model2, target_layers=target_layers) as cam:
+            if args.arch in ['ResNet18_32x32', 'ResNet18_224x224', 'resnet50']:
+                target_layers = [model2.layer4[-1]]
+            elif args.arch == 'swin-t':
+                # https://github.com/jacobgil/pytorch-grad-cam/blob/master/usage_examples/swinT_example.py
+                target_layers = [model2.features[-1][-1].norm1]
+            elif args.arch == 'vit-b-16':
+                # https://github.com/jacobgil/pytorch-grad-cam/blob/master/usage_examples/vit_example.py
+                target_layers = [model2.encoder.layers[-1]]
+            else:
+                raise NotImplementedError("Arch not found {}".format(args.arch))
 
+
+            with GradCAM(model=model2, target_layers=target_layers) as cam:
                 outputs_ben  = cam(input_tensor=data,         targets=targets)
                 outputs_pgd  = cam(input_tensor=clipped_advs, targets=targets)
 
@@ -399,8 +409,8 @@ class AttackDataset:
         predictions["ben"] = torch.cat(predictions_ben)
         predictions[args.att] = torch.cat(predictions_pgd)
 
-        torch.save(xaimaps,     os.path.join(home, f"IWR/OpenOOD/results/xai/gradcams_{args.att}_{self.id_name}_{args.arch}.pt"))
-        torch.save(predictions, os.path.join(home, f"IWR/OpenOOD/results/xai/predictions_{args.att}_{self.id_name}_{args.arch}.pt"))
+        torch.save(xaimaps,     os.path.join(home, f"IWR/OpenOOD/results/xai/gradcams_{args.att}_{self.id_name}_{args.arch}.pt"), pickle_protocol=5)
+        torch.save(predictions, os.path.join(home, f"IWR/OpenOOD/results/xai/predictions_{args.att}_{self.id_name}_{args.arch}.pt"), pickle_protocol=5)
 
         # save dictionary
         attacked_target["correct_predicted"] = correct_predicted
@@ -408,4 +418,4 @@ class AttackDataset:
         attacked_target["success_full_attacked_target"] = torch.cat(attacked_target["success_full_attacked_target"])
         attacked_target["attacked_prediction"] = torch.cat(attacked_target["attacked_prediction"])
         attacked_target[args.att] = torch.vstack(attacked_target[args.att])
-        torch.save(attacked_target, os.path.join(base_pth, args.att + "_attacked_target.pth"))
+        torch.save(attacked_target, os.path.join(base_pth, args.att + "_attacked_target.pth"), pickle_protocol=5)

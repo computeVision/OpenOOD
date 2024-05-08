@@ -49,9 +49,9 @@ parser.add_argument('--arch',
 parser.add_argument('--tvs-version', default=1, choices=[1, 2])
 parser.add_argument('--ckpt-path', default=None)
 parser.add_argument('--tvs-pretrained', action='store_true')
-parser.add_argument('--batch-size', default=50, type=int)
+parser.add_argument('--batch-size', default=200, type=int)
 
-parser.add_argument("--att",  default="pgd", choices=[None, 'fgsm', 'bim', 'pgd', 'df', 'cw', 'mpgd'], help="")
+parser.add_argument("--att",  default="pgd", choices=[None, 'fgsm', 'bim', 'pgd', 'df', 'cw', 'masked_pgd'], help="")
 parser.add_argument("--bpda",  default=False, type=str2bool, help="")
 parser.add_argument("--eps",  default="4/255", help="")
 parser.add_argument("--norm",  default="Linf", choices=['Linf', 'L2', 'L1'], help="")
@@ -131,7 +131,6 @@ attackdataset = AttackDataset(
     batch_size=args.
     batch_size,  # for certain methods the results can be slightly affected by batch size
     shuffle=False,
-    num_workers=8
-    )
+    num_workers=8)
 
 attackdataset.run_attack(args)
