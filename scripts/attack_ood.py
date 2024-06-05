@@ -56,6 +56,7 @@ parser.add_argument("--bpda",  default=False, type=str2bool, help="")
 parser.add_argument("--eps",  default="4/255", help="")
 parser.add_argument("--norm",  default="Linf", choices=['Linf', 'L2', 'L1'], help="")
 parser.add_argument('--masked-patch-size', default=60, type=int)
+parser.add_argument('--take-model', type=int, default=-1)
 
 parser.add_argument("--debug",  default=False, type=str2bool, help="")
 args = parser.parse_args()
@@ -102,71 +103,72 @@ if len(glob(os.path.join(root, 's*'))) == 0:
 all_metrics = []
 # subfolders = glob(os.path.join(root, 's*'))
 # todo expand to variation
-subfolders = glob(os.path.join(root, 's2')) # just take the last model, todo
-for subfolder in sorted(subfolders):
-    # load pre-setup postprocessor if exists
-    if os.path.isfile(
-            os.path.join(subfolder, 'postprocessors',
-                         f'{postprocessor_name}.pkl')):
-        with open(
-                os.path.join(subfolder, 'postprocessors',
-                             f'{postprocessor_name}.pkl'), 'rb') as f:
-            postprocessor = pickle.load(f)
-    else:
-        postprocessor = None
+subfolders = sorted(glob(os.path.join(root, 's2')))
+subfolder = subfolders[args.take_model]
 
-    # load the pretrained model provided by the user
-    if postprocessor_name == 'conf_branch':
-        net = ConfBranchNet(backbone=model_arch(num_classes=num_classes),
-                            num_classes=num_classes)
-    elif postprocessor_name == 'godin':
-        backbone = model_arch(num_classes=num_classes)
-        net = GodinNet(backbone=backbone,
-                       feature_size=backbone.feature_size,
-                       num_classes=num_classes)
-    elif postprocessor_name == 'rotpred':
-        net = RotNet(backbone=model_arch(num_classes=num_classes),
-                     num_classes=num_classes)
-    elif 'csi' in root:
-        backbone = model_arch(num_classes=num_classes)
-        net = CSINet(backbone=backbone,
-                     feature_size=backbone.feature_size,
-                     num_classes=num_classes)
-    elif 'udg' in root:
-        backbone = model_arch(num_classes=num_classes)
-        net = UDGNet(backbone=backbone,
-                     num_classes=num_classes,
-                     num_clusters=1000)
-    elif postprocessor_name == 'cider':
-        backbone = model_arch(num_classes=num_classes)
-        net = CIDERNet(backbone,
-                       head='mlp',
-                       feat_dim=128,
-                       num_classes=num_classes)
-    elif postprocessor_name == 'npos':
-        backbone = model_arch(num_classes=num_classes)
-        net = NPOSNet(backbone,
-                      head='mlp',
-                      feat_dim=128,
-                      num_classes=num_classes)
-    else:
-        net = model_arch(num_classes=num_classes)
-    
-    net.load_state_dict(
-        torch.load(os.path.join(subfolder, 'best.ckpt'), map_location='cpu'))
-    net.cuda()
-    net.eval()
+# load pre-setup postprocessor if exists
+if os.path.isfile(
+        os.path.join(subfolder, 'postprocessors',
+                        f'{postprocessor_name}.pkl')):
+    with open(
+            os.path.join(subfolder, 'postprocessors',
+                            f'{postprocessor_name}.pkl'), 'rb') as f:
+        postprocessor = pickle.load(f)
+else:
+    postprocessor = None
+
+# load the pretrained model provided by the user
+if postprocessor_name == 'conf_branch':
+    net = ConfBranchNet(backbone=model_arch(num_classes=num_classes),
+                        num_classes=num_classes)
+elif postprocessor_name == 'godin':
+    backbone = model_arch(num_classes=num_classes)
+    net = GodinNet(backbone=backbone,
+                    feature_size=backbone.feature_size,
+                    num_classes=num_classes)
+elif postprocessor_name == 'rotpred':
+    net = RotNet(backbone=model_arch(num_classes=num_classes),
+                    num_classes=num_classes)
+elif 'csi' in root:
+    backbone = model_arch(num_classes=num_classes)
+    net = CSINet(backbone=backbone,
+                    feature_size=backbone.feature_size,
+                    num_classes=num_classes)
+elif 'udg' in root:
+    backbone = model_arch(num_classes=num_classes)
+    net = UDGNet(backbone=backbone,
+                    num_classes=num_classes,
+                    num_clusters=1000)
+elif postprocessor_name == 'cider':
+    backbone = model_arch(num_classes=num_classes)
+    net = CIDERNet(backbone,
+                    head='mlp',
+                    feat_dim=128,
+                    num_classes=num_classes)
+elif postprocessor_name == 'npos':
+    backbone = model_arch(num_classes=num_classes)
+    net = NPOSNet(backbone,
+                    head='mlp',
+                    feat_dim=128,
+                    num_classes=num_classes)
+else:
+    net = model_arch(num_classes=num_classes)
+
+net.load_state_dict(
+    torch.load(os.path.join(subfolder, 'best.ckpt'), map_location='cpu'))
+net.cuda()
+net.eval()
 
 
 attackdataset = AttackDataset(
-    net,
-    id_name=args.id_data,  # the target ID dataset
-    data_root=os.path.join(ROOT_DIR, 'data'),
-    config_root=os.path.join(ROOT_DIR, 'configs'),
-    preprocessor=None,  # default preprocessing
-    batch_size=args.
-    batch_size,  # for certain methods the results can be slightly affected by batch size
-    shuffle=False,
-    num_workers=8)
+net,
+id_name=args.id_data,  # the target ID dataset
+data_root=os.path.join(ROOT_DIR, 'data'),
+config_root=os.path.join(ROOT_DIR, 'configs'),
+preprocessor=None,  # default preprocessing
+batch_size=args.
+batch_size,  # for certain methods the results can be slightly affected by batch size
+shuffle=False,
+num_workers=8)
 
 attackdataset.run_attack(args)
